@@ -1,5 +1,50 @@
 #!/bin/bash
 
+# 检查并安装必要依赖库
+install_dependencies() {
+    if ! command -v socat &> /dev/null; then
+        echo "socat 未安装，正在安装..."
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y socat
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y socat
+        else
+            echo "未能识别包管理器，请手动安装 socat。"
+            exit 1
+        fi
+    fi
+
+    if ! command -v lsof &> /dev/null; then
+        echo "lsof 未安装，正在安装..."
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y lsof
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y lsof
+        else
+            echo "未能识别包管理器，请手动安装 lsof。"
+            exit 1
+        fi
+    fi
+
+    if ! command -v nc &> /dev/null; then
+        echo "nc (netcat) 未安装，正在安装..."
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y netcat
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y nc
+        else
+            echo "未能识别包管理器，请手动安装 netcat。"
+            exit 1
+        fi
+    fi
+}
+
+# 安装必要依赖库
+install_dependencies
+
 # 读取用户输入的内网 IP 和端口
 read -p "请输入内网 IP: " internal_ip
 read -p "请输入内网端口: " internal_port
