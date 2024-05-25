@@ -1,4 +1,8 @@
 ### 使用方法
+一键脚本
+```sh
+bash <(curl -fsSL https://raw.githubusercontent.com/dong-dong6/PortTrafficForwarding/main/forward.sh)
+```
 
 1. 保存脚本到文件，例如 `forward.sh`。
 2. 给予脚本执行权限：
