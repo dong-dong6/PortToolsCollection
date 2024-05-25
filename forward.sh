@@ -62,7 +62,7 @@ case $option in
         # 检查目标内网服务是否可达
         echo "检查目标内网服务是否可达..."
         if ! nc -z ${internal_ip} ${internal_port}; then
-        echo "无法连接到内网 ${internal_ip}:${internal_port}，请检查目标服务是否正在运行并监听该端口。"
+            echo "无法连接到内网 ${internal_ip}:${internal_port}，请检查目标服务是否正在运行并监听该端口。"
             exit 1
         fi
 
@@ -86,7 +86,7 @@ case $option in
         read -p "请输入要删除的规则序号: " rule_number
 
         # 获取要删除规则的端口
-        external_port=$(lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND | awk -v num=$rule_number 'NR==num+1 {print $4}' | sed 's/.*://')
+        external_port=$(lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND | awk -v num=$rule_number 'NR==num {print $4}' | sed 's/.*://')
 
         if [ -z "$external_port" ]; then
             echo "无效的规则序号。"
@@ -104,7 +104,7 @@ case $option in
         echo "当前所有流量转发规则:"
         lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
         ;;
-    *)
+        *)
         echo "无效选项，请选择 1, 2 或 3."
         ;;
 esac
