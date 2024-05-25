@@ -80,17 +80,23 @@ case $option in
 
     2)
         # 删除转发
-        read -p "请输入外网端口: " external_port
+        echo "当前流量转发规则:"
+        lsof -i TCP | grep LISTEN | awk '{print NR, $1, $2, $9}' | grep LISTEN
 
-        # 检查外网端口是否被占用
-        if lsof -i TCP:${external_port} | grep LISTEN; then
-            echo "正在终止占用外网端口 ${external_port} 的进程..."
-            # 杀掉占用该端口的进程
-            fuser -k ${external_port}/tcp
-            echo "已删除从外网端口 ${external_port} 的转发规则。"
-        else
-            echo "外网端口 ${external_port} 未被占用，无需删除。"
+        read -p "请输入要删除的规则序号: " rule_number
+
+        # 获取要删除规则的端口
+        external_port=$(lsof -i TCP | grep LISTEN | awk '{print NR, $1, $2, $9}' | grep LISTEN | awk -v num=$rule_number 'NR==num {print $4}' | sed 's/.*://')
+
+        if [ -z "$external_port" ]; then
+            echo "无效的规则序号。"
+            exit 1
         fi
+
+        echo "正在终止占用外网端口 ${external_port} 的进程..."
+        # 杀掉占用该端口的进程
+        fuser -k ${external_port}/tcp
+        echo "已删除从外网端口 ${external_port} 的转发规则。"
         ;;
 
     3)
@@ -98,7 +104,6 @@ case $option in
         echo "当前流量转发规则:"
         lsof -i TCP | grep LISTEN
         ;;
-
     *)
         echo "无效选项，请选择 1, 2 或 3."
         ;;
