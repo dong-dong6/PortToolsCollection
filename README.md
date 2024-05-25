@@ -56,9 +56,7 @@ TCP-LISTEN 内网IP:内网端口->外网端口
 如果你想要一键安装和运行该脚本，可以使用以下命令：
 
 ```bash
-curl -O https://raw.githubusercontent.com/dong-dong6/PortTrafficForwarding/main/forward.sh
-chmod +x forward.sh
-./forward.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/dong-dong6/PortTrafficForwarding/main/forward.sh)
 ```
 
 ## 注意事项
