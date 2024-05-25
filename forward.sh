@@ -62,7 +62,7 @@ case $option in
         # 检查目标内网服务是否可达
         echo "检查目标内网服务是否可达..."
         if ! nc -z ${internal_ip} ${internal_port}; then
-            echo "无法连接到内网 ${internal_ip}:${internal_port}，请检查目标服务是否正在运行并监听该端口。"
+        echo "无法连接到内网 ${internal_ip}:${internal_port}，请检查目标服务是否正在运行并监听该端口。"
             exit 1
         fi
 
@@ -102,7 +102,7 @@ case $option in
     3)
         # 列出所有规则
         echo "当前所有流量转发规则:"
-        lsof -i TCP -lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
+        lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
         ;;
     *)
         echo "无效选项，请选择 1, 2 或 3."
