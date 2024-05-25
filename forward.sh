@@ -81,12 +81,12 @@ case $option in
     2)
         # 删除转发
         echo "当前流量转发规则:"
-        lsof -i TCP | grep LISTEN | awk '{print NR, $1, $2, $9}' | grep LISTEN
+        lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
 
         read -p "请输入要删除的规则序号: " rule_number
 
         # 获取要删除规则的端口
-        external_port=$(lsof -i TCP | grep LISTEN | awk '{print NR, $1, $2, $9}' | grep LISTEN | awk -v num=$rule_number 'NR==num {print $4}' | sed 's/.*://')
+        external_port=$(lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND | awk -v num=$rule_number 'NR==num+1 {print $4}' | sed 's/.*://')
 
         if [ -z "$external_port" ]; then
             echo "无效的规则序号。"
@@ -101,8 +101,8 @@ case $option in
 
     3)
         # 列出所有规则
-        echo "当前流量转发规则:"
-        lsof -i TCP | grep LISTEN
+        echo "当前所有流量转发规则:"
+        lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
         ;;
     *)
         echo "无效选项，请选择 1, 2 或 3."
