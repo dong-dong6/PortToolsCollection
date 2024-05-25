@@ -45,28 +45,61 @@ install_dependencies() {
 # 安装必要依赖库
 install_dependencies
 
-# 读取用户输入的内网 IP 和端口
-read -p "请输入内网 IP: " internal_ip
-read -p "请输入内网端口: " internal_port
+# 显示菜单
+echo "请选择操作:"
+echo "1) 添加转发"
+echo "2) 删除转发"
+echo "3) 列出所有规则"
+read -p "输入选项 (1/2/3): " option
 
-# 读取用户输入的外网端口
-read -p "请输入外网端口: " external_port
+case $option in
+    1)
+        # 添加转发
+        read -p "请输入内网 IP: " internal_ip
+        read -p "请输入内网端口: " internal_port
+        read -p "请输入外网端口: " external_port
 
-# 检查目标内网服务是否可达
-echo "检查目标内网服务是否可达..."
-if ! nc -z ${internal_ip} ${internal_port}; then
-    echo "无法连接到内网 ${internal_ip}:${internal_port}，请检查目标服务是否正在运行并监听该端口。"
-    exit 1
-fi
+        # 检查目标内网服务是否可达
+        echo "检查目标内网服务是否可达..."
+        if ! nc -z ${internal_ip} ${internal_port}; then
+            echo "无法连接到内网 ${internal_ip}:${internal_port}，请检查目标服务是否正在运行并监听该端口。"
+            exit 1
+        fi
 
-# 检查外网端口是否被占用
-if lsof -i TCP:${external_port} | grep LISTEN; then
-    echo "外网端口 ${external_port} 已被占用，正在终止占用该端口的进程..."
-    # 杀掉占用该端口的进程
-    fuser -k ${external_port}/tcp
-fi
+        # 检查外网端口是否被占用
+        if lsof -i TCP:${external_port} | grep LISTEN; then
+            echo "外网端口 ${external_port} 已被占用，正在终止占用该端口的进程..."
+            # 杀掉占用该端口的进程
+            fuser -k ${external_port}/tcp
+        fi
 
-# 使用 socat 命令实现流量转发
-socat TCP-LISTEN:${external_port},fork TCP:${internal_ip}:${internal_port} &
+        # 使用 socat 命令实现流量转发
+        socat TCP-LISTEN:${external_port},fork TCP:${internal_ip}:${internal_port} &
+        echo "流量转发已启动：从外网端口 ${external_port} 到内网 ${internal_ip}:${internal_port}"
+        ;;
 
-echo "流量转发已启动：从外网端口 ${external_port} 到内网 ${internal_ip}:${internal_port}"
+    2)
+        # 删除转发
+        read -p "请输入外网端口: " external_port
+
+        # 检查外网端口是否被占用
+        if lsof -i TCP:${external_port} | grep LISTEN; then
+            echo "正在终止占用外网端口 ${external_port} 的进程..."
+            # 杀掉占用该端口的进程
+            fuser -k ${external_port}/tcp
+            echo "已删除从外网端口 ${external_port} 的转发规则。"
+        else
+            echo "外网端口 ${external_port} 未被占用，无需删除。"
+        fi
+        ;;
+
+    3)
+        # 列出所有规则
+        echo "当前流量转发规则:"
+        lsof -i TCP | grep LISTEN
+        ;;
+
+    *)
+        echo "无效选项，请选择 1, 2 或 3."
+        ;;
+esac
