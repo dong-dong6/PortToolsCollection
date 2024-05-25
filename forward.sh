@@ -81,30 +81,31 @@ case $option in
     2)
         # 删除转发
         echo "当前流量转发规则:"
-        lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
+        ps aux | grep '[s]ocat' | awk '{print NR-1, $0}'
 
         read -p "请输入要删除的规则序号: " rule_number
 
-        # 获取要删除规则的端口
-        external_port=$(lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND | awk -v num=$rule_number 'NR==num {print $4}' | sed 's/.*://')
+        # 获取要删除规则的进程ID
+        pid=$(ps aux | grep '[s]ocat' | awk -v num=$rule_number 'NR==num+1 {print $2}')
 
-        if [ -z "$external_port" ]; then
+        if [ -z "$pid" ]; then
             echo "无效的规则序号。"
             exit 1
         fi
 
-        echo "正在终止占用外网端口 ${external_port} 的进程..."
-        # 杀掉占用该端口的进程
-        fuser -k ${external_port}/tcp
-        echo "已删除从外网端口 ${external_port} 的转发规则。"
+        echo "正在终止进程 ID 为 ${pid} 的流量转发规则..."
+        # 杀掉相应的 socat 进程
+        kill -9 ${pid}
+        echo "已删除的流量转发规则。"
         ;;
 
     3)
         # 列出所有规则
         echo "当前所有流量转发规则:"
-        lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
+        ps aux | grep '[s]ocat' | awk '{for (i=1;i<=NF;i++) if ($i ~ /TCP-LISTEN/) print NR-1, $i, $(i+1)}' | awk -F '[,:]' '{print $1 " " $2 ":" $3 " ---> " $6 ":" $7}'
         ;;
-        *)
+
+    *)
         echo "无效选项，请选择 1, 2 或 3."
         ;;
 esac
