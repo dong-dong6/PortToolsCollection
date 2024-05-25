@@ -102,9 +102,11 @@ case $option in
     3)
         # 列出所有规则
         echo "当前所有流量转发规则:"
-        lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
+        lsof -i TCP -lsof -i TCP -sTCP:LISTEN | awk '{print NR-1, $1, $2, $9}' | grep -v COMMAND
         ;;
     *)
         echo "无效选项，请选择 1, 2 或 3."
         ;;
 esac
+
+exit 0
