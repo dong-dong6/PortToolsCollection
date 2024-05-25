@@ -73,9 +73,14 @@ case $option in
             fuser -k ${external_port}/tcp
         fi
 
-        # 使用 socat 命令实现流量转发
-        socat TCP-LISTEN:${external_port},fork TCP:${internal_ip}:${internal_port} &
-        echo "流量转发已启动：从外网端口 ${external_port} 到内网 ${internal_ip}:${internal_port}"
+        # 检查是否已存在相同的转发规则
+        if ps aux | grep '[s]ocat' | grep -q "TCP-LISTEN:${external_port},fork TCP:${internal_ip}:${internal_port}"; then
+            echo "相同的转发规则已经存在：从外网端口 ${external_port} 到内网 ${internal_ip}:${internal_port}"
+        else
+            # 使用 socat 命令实现流量转发
+            socat TCP-LISTEN:${external_port},fork TCP:${internal_ip}:${internal_port} &
+            echo "流量转发已启动：从外网端口 ${external_port} 到内网 ${internal_ip}:${internal_port}"
+        fi
         ;;
 
     2)
@@ -102,7 +107,8 @@ case $option in
     3)
         # 列出所有规则
         echo "当前所有流量转发规则:"
-        ps aux | grep '[s]ocat' | awk '{for (i=1;i<=NF;i++) if ($i ~ /TCP-LISTEN/) print NR-1, $i, $(i+1)}' | awk -F '[,:]' '{print $1 " " $2 ":" $3 " ---> " $6 ":" $7}'
+        # 使用 ps 命令找出正在运行的 socat 进程，并解析转发规则信息
+        ps aux | grep '[s]ocat' | grep -o 'TCP-LISTEN:[0-9]*,[^ ]* TCP:[0-9.]*:[0-9]*' | awk -F '[:, ]+' '{print $1 " " $5 ":" $6 "->" $2}'
         ;;
 
     *)
