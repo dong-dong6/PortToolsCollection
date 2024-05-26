@@ -38,18 +38,18 @@
 ```
 1. 克隆本仓库到本地：
    ```sh
-   git clone https://github.com/your-repo/your-project.git
-   cd your-project
+   git clone https://github.com/dong-dong6/PortToolsCollection.git
+   cd PortToolsCollection
    ```
 
 2. 赋予脚本可执行权限：
    ```sh
-   chmod +x script.sh
+   chmod +x forward.sh
    ```
 
 3. 运行脚本：
    ```sh
-   ./script.sh
+   ./forward.sh
    ```
 
 4. 按照屏幕提示选择操作，并输入相应信息。
@@ -70,13 +70,13 @@
 
 1. 克隆本仓库到本地：
    ```powershell
-   git clone https://github.com/your-repo/your-project.git
-   cd your-project
+   git clone https://github.com/dong-dong6/PortToolsCollection.git
+   cd PortToolsCollection
    ```
 
 2. 运行脚本：
    ```powershell
-   ./script.ps1
+   ./forward-windows.ps1
    ```
 
 3. 按照屏幕提示选择操作，并输入相应信息。
