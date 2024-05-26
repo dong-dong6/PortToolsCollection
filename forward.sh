@@ -87,7 +87,8 @@ while true; do
     case $option in
         1)
             # 本地端口服务检查
-            local_ip="127.0.0.1"  # 默认内网 IP 为 127.0.0.1
+            read -p "请输入本地 IP [默认127.0.0.1]: " local_ip
+            local_ip=${local_ip:-127.0.0.1}
             read -p "请输入端口: " port
 
             # 检查本地端口服务
@@ -155,7 +156,8 @@ while true; do
             case $sub_option in
                 1)
                     # 添加转发
-                    internal_ip="127.0.0.1"  # 默认内网 IP 为 127.0.0.1
+                    read -p "请输入内网 IP [默认127.0.0.1]: " internal_ip
+                    internal_ip=${internal_ip:-127.0.0.1}
                     read -p "请输入内网端口: " internal_port
                     read -p "请输入外网端口: " external_port
 
