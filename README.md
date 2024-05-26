@@ -59,4 +59,4 @@
 如果你想要一键安装和运行该脚本，可以使用以下命令：
 
 ```bash
-bash <(curl -fsSL https://yourdomain.com/path/to/2024-05-26-13-MJUhaVAn1YoJlOiRyF1J.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/dong-dong6/PortToolsCollection/main/forward.sh)
