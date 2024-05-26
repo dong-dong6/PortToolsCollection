@@ -243,4 +243,26 @@ while true; do
                     read -p "请输入端口号: " fw_port
                     read -p "请输入协议 (tcp/udp) [默认tcp]: " fw_protocol
                     fw_protocol=${fw_protocol:-tcp}
-                    read -p "
+                    read -p "允许访问的IP段 [默认0.0.0.0/0]: " fw_ip
+                    fw_ip=${fw_ip:-0.0.0.0/0}
+                    read -p "请输入备注 [默认当前时间]: " fw_comment
+                    fw_comment=${fw_comment:-$(date)}
+                    
+                    # 添加防火墙规则
+                    echo -e "\e[36m添加防火墙规则: 端口 ${fw_port}, 协议 ${fw_protocol}, 允许IP段 ${fw_ip}, 备注 ${fw_comment}\e[0m"
+                    sudo ufw allow from ${fw_ip} to any port ${fw_port} proto ${fw_protocol} comment "${fw_comment}"
+                    sudo ufw reload
+                    echo -e "\e[32m防火墙规则已添加。\e[0m"
+                    ;;
+
+                *)
+                    echo -e "\e[31m无效选项，请选择 1 或 2。\e[0m"
+                    ;;
+            esac
+            ;;
+
+        *)
+            echo -e "\e[31m无效选项，请选择 1, 2, 3 或 4。请输入正确ID，或者按Ctrl+C退出。\e[0m"
+            ;;
+    esac
+done
