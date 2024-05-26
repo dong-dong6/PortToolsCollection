@@ -63,6 +63,10 @@
 ## Windows (PowerShell) 脚本
 
 ### 使用方法
+#### 一键脚本
+```sh
+iwr -useb https://raw.githubusercontent.com/dong-dong6/PortToolsCollection/main/forward-windows.ps1 | iex
+```
 
 1. 克隆本仓库到本地：
    ```powershell
