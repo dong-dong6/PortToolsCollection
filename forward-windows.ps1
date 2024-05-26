@@ -1,3 +1,6 @@
+# 设置正确的编码格式
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 # 打印 logo
 function Print-Logo {
     Write-Host -ForegroundColor Green @"
