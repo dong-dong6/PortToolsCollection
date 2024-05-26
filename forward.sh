@@ -55,6 +55,23 @@ install_dependencies() {
     fi
 }
 
+# 检查并设置 net.ipv4.ip_forward
+check_ip_forward() {
+    ip_forward=$(sysctl -n net.ipv4.ip_forward)
+    if [ "$ip_forward" -ne 1 ]; then
+        echo -e "\e[31m[net.ipv4.ip_forward 未启用，端口转发需要启用此设置。]\e[0m"
+        read -p "是否启用 net.ipv4.ip_forward? (y/n): " confirm
+        if [ "$confirm" == "y" ]; then
+            sudo sysctl -w net.ipv4.ip_forward=1
+            sudo bash -c 'echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf'
+            echo -e "\e[32m[net.ipv4.ip_forward 已启用。]\e[0m"
+        else
+            echo -e "\e[31m[未启用 net.ipv4.ip_forward，无法进行端口转发。]\e[0m"
+            exit 1
+        fi
+    fi
+}
+
 # 打印 logo
 print_logo() {
     echo -e "\e[32m"
@@ -156,6 +173,8 @@ while true; do
             case $sub_option in
                 1)
                     # 添加转发
+                    check_ip_forward
+
                     read -p "请输入内网 IP [默认127.0.0.1]: " internal_ip
                     internal_ip=${internal_ip:-127.0.0.1}
                     read -p "请输入内网端口: " internal_port
