@@ -40,6 +40,19 @@ install_dependencies() {
             exit 1
         fi
     fi
+
+    if ! command -v ufw &> /dev/null; then
+        echo -e "\e[31m[ufw 未安装，正在安装...]\e[0m"
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y ufw
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y ufw
+        else
+            echo -e "\e[31m[未能识别包管理器，请手动安装 ufw。]\e[0m"
+            exit 1
+        fi
+    fi
 }
 
 # 打印 logo
@@ -68,7 +81,8 @@ while true; do
     echo -e "\e[33m1) 本地端口服务检查\e[0m"
     echo -e "\e[33m2) 检查外网端口服务\e[0m"
     echo -e "\e[33m3) 端口流量转发\e[0m"
-    read -p "输入选项 (1/2/3): " option
+    echo -e "\e[33m4) 管理防火墙规则\e[0m"
+    read -p "输入选项 (1/2/3/4): " option
 
     case $option in
         1)
@@ -210,8 +224,45 @@ while true; do
             esac
             ;;
 
+        4)
+            # 防火墙管理子菜单
+            echo -e "\e[36m请选择操作:\e[0m"
+            echo -e "\e[33m1) 列出当前防火墙规则\e[0m"
+            echo -e "\e[33m2) 添加防火墙规则\e[0m"
+            read -p "输入选项 (1/2): " fw_option
+
+            case $fw_option in
+                1)
+                    # 列出当前防火墙规则
+                    echo -e "\e[36m当前防火墙规则:\e[0m"
+                    sudo ufw status verbose
+                    ;;
+
+                2)
+                    # 添加防火墙规则
+                    read -p "请输入端口号: " fw_port
+                    read -p "请输入协议 (tcp/udp) [默认tcp]: " fw_protocol
+                    fw_protocol=${fw_protocol:-tcp}
+                    read -p "允许访问的IP段 [默认0.0.0.0/0]: " fw_ip
+                    fw_ip=${fw_ip:-0.0.0.0/0}
+                    read -p "请输入备注 [默认当前时间]: " fw_comment
+                    fw_comment=${fw_comment:-$(date)}
+                    
+                    # 添加防火墙规则
+                    echo -e "\e[36m添加防火墙规则: 端口 ${fw_port}, 协议 ${fw_protocol}, 允许IP段 ${fw_ip}, 备注 ${fw_comment}\e[0m"
+                    sudo ufw allow from ${fw_ip} to any port ${fw_port} proto ${fw_protocol} comment "${fw_comment}"
+                    sudo ufw reload
+                    echo -e "\e[32m防火墙规则已添加。\e[0m"
+                    ;;
+
+                *)
+                    echo -e "\e[31m无效选项，请选择 1 或 2。\e[0m"
+                    ;;
+            esac
+            ;;
+
         *)
-            echo -e "\e[31m无效选项，请选择 1, 2 或 3。请输入正确ID，或者按Ctrl+C退出。\e[0m"
+            echo -e "\e[31m无效选项，请选择 1, 2, 3 或 4。请输入正确ID，或者按Ctrl+C退出。\e[0m"
             ;;
     esac
 done
